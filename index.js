@@ -12,7 +12,7 @@ function addListeners() {
     document.getElementById('movePlay')
         .addEventListener('click', function () {
             const block = document.getElementById('moveBlock');
-            animaster().move(block, 1000, {x: 100, y: 10});
+            animaster().addMove(1000, {x: 100, y: 10}).play(block);
         });
 
     document.getElementById('scalePlay')
@@ -51,7 +51,7 @@ function getTransform(translation, ratio) {
 }
 
 function animaster() {
-    let resetFadeIn =  function (element) {
+    let resetFadeIn = function (element) {
         element.style.transitionDuration = null;
         element.classList.remove('show');
     }
@@ -61,11 +61,13 @@ function animaster() {
         element.classList.remove('hide');
     }
 
-    let resetMoveAndScale = function(element) {
+    let resetMoveAndScale = function (element) {
         element.style.transitionDuration = null;
         element.style.transform = null;
     }
     return {
+        _steps: [],
+
         /**
          * Блок плавно появляется из прозрачного.
          * @param element — HTMLElement, который надо анимировать
@@ -145,5 +147,28 @@ function animaster() {
                 this.fadeOut(element, duration * 1 / 3)
             }, duration * 2 / 3);
         },
+
+        addMove(duration, translation) {
+            this._steps.push({
+                name: 'move',
+                duration,
+                translation
+            });
+            return this;
+        },
+
+        play(element) {
+            for (const step of this._steps) {
+                switch (step.name) {
+                    case 'move':
+                        this.move(element, step.duration, step.translation);
+                        break;
+
+                    default:
+                        console.log('Unknown step: ' + step.name);
+                        break;
+                }
+            }
+        }
     }
 }
