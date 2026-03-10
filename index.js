@@ -1,4 +1,6 @@
 addListeners();
+// const heartbeatBlock = document.getElementById('heartbeatBlock');
+// const heartBeating = animaster().heartBeating(heartbeatBlock);
 
 function addListeners() {
     document.getElementById('fadeInPlay')
@@ -18,6 +20,23 @@ function addListeners() {
             const block = document.getElementById('scaleBlock');
             animaster().scale(block, 1000, 1.25);
         });
+
+    document.getElementById('mahPlay')
+        .addEventListener('click', function () {
+            const block = document.getElementById('mahBlock');
+            animaster().moveAndHide(block, 1000, 1.25);
+        });
+
+    document.getElementById('sahPlay')
+        .addEventListener('click', function () {
+            const block = document.getElementById('sahBlock');
+            animaster().showAndHide(block, 1000, 1.25);
+        });
+
+    // document.getElementById('heartbeatStop')
+    //     .addEventListener('click', function () {
+    //         heartBeating.stop();
+    //     });
 }
 
 function getTransform(translation, ratio) {
@@ -72,6 +91,21 @@ function animaster() {
             element.style.transform = getTransform(null, ratio);
         },
 
+        heartBeating(element) {
+            let playAnim = true;
+            const stopObj = {
+                stop() {
+                    playAnim = false;
+                }
+            }
+
+            while (playAnim) {
+                this.scale(element, 500, 1.4);
+                setTimeout(()=>this.scale(element, 500, 1),500);
+            }
+            return stopObj;
+        },
+
         moveAndHide(element, duration, translation) {
             const dur1 = duration * 2/5;
             const dur2 = duration * 3/5;
@@ -80,9 +114,8 @@ function animaster() {
         },
 
         showAndHide(element, duration) {
-            this.fageIn(element, duration*1/3);
-            setTimeout(() => {},duration*1/3);
-            this.fageIn(element, duration*1/3);
+            this.fadeIn(element, duration*1/3);
+            setTimeout(() => {this.fadeOut(element, duration*1/3)},duration*2/3);
         },
     }
 }
