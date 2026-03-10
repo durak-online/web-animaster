@@ -122,13 +122,13 @@ function animaster() {
 
             const step1 = () => {
                 if (!active) return;
-                this.scale(element, 500, 1.4);
+                this.addScale(500, 1.4).play(element);
                 timer2 = setTimeout(step2, 500);
             };
 
             const step2 = () => {
                 if (!active) return;
-                this.scale(element, 500, 1);
+                this.addScale(500, 1).play(element);
                 timer1 = setTimeout(step1, 500);
             };
 
@@ -146,8 +146,7 @@ function animaster() {
         moveAndHide(element, duration) {
             const dur1 = duration * 2 / 5;
             const dur2 = duration * 3 / 5;
-            this.move(element, dur1, {x: 100, y: 20});
-            this.fadeOut(element, dur2);
+            this.addMove(dur1, {x: 100, y: 20}).addFadeOut(dur2).play(element);
 
             return {
                 stop() {
@@ -158,9 +157,9 @@ function animaster() {
         },
 
         showAndHide(element, duration) {
-            this.fadeIn(element, duration * 1 / 3);
+            this.addFadeIn(duration * 1 / 3).play(element);
             setTimeout(() => {
-                this.fadeOut(element, duration * 1 / 3)
+                this.addFadeOut(duration * 1 / 3).play(element);
             }, duration * 2 / 3);
         },
 
