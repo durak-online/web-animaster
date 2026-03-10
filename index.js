@@ -1,6 +1,6 @@
 addListeners();
 const heartbeatBlock = document.getElementById('heartbeatBlock');
-const heartBeating = animaster().heartBeating(heartbeatBlock);
+const heartBeatingObj = animaster().heartBeating(heartbeatBlock);
 let mah = null;
 
 function addListeners() {
@@ -36,12 +36,12 @@ function addListeners() {
 
     document.getElementById('heartbeatStop')
         .addEventListener('click', function () {
-            heartBeating.stop();
+            heartBeatingObj.stop();
         });
 
     document.getElementById('mahReset')
         .addEventListener('click', function () {
-            mah.stop();
+            mah.reset();
         });
 
 
@@ -117,30 +117,8 @@ function animaster() {
         },
 
         heartBeating(element) {
-            let active = true;
-            let timer1, timer2;
-
-            const step1 = () => {
-                if (!active) return;
-                this.scale(element, 500, 1.4);
-                timer2 = setTimeout(step2, 500);
-            };
-
-            const step2 = () => {
-                if (!active) return;
-                this.scale(element, 500, 1);
-                timer1 = setTimeout(step1, 500);
-            };
-
-            timer1 = setTimeout(step1, 0);
-
-            return {
-                stop() {
-                    active = false;
-                    clearTimeout(timer1);
-                    clearTimeout(timer2);
-                }
-            };
+            this.addScale(500, 1.4).addScale(500, 1);
+            return this.play(element, true);
         },
 
         moveAndHide(element, duration) {
@@ -198,24 +176,82 @@ function animaster() {
             return this;
         },
 
-        play(element) {
-            for (const step of this._steps) {
-                switch (step.name) {
+        addDelay(duration) {
+            this._steps.push({name: 'delay', duration});
+            return this;
+        },
+
+        // Исправленный метод play
+        play(element, cycled = false) {
+            const steps = this._steps;
+            let stopped = false;
+            let timerId = null;
+            let currentIndex = 0;
+
+            const runStep = () => {
+                if (stopped) return;
+
+                // Если все шаги выполнены
+                if (currentIndex >= steps.length) {
+                    if (cycled && steps.length > 0) {
+                        currentIndex = 0;          // начать заново
+                        runStep();                  // сразу перейти к первому шагу
+                    }
+                    return;
+                }
+
+                const step = steps[currentIndex];
+                const {name, duration, translation, ratio} = step;
+
+                // Выполняем текущий шаг
+                switch (name) {
                     case 'move':
-                        this.move(element, step.duration, step.translation);
+                        this.move(element, duration, translation);
                         break;
                     case 'scale':
-                        this.scale(element, step.duration, step.ratio);
+                        this.scale(element, duration, ratio);
                         break;
                     case 'fadeIn':
-                        this.fadeIn(element, step.duration);
+                        this.fadeIn(element, duration);
                         break;
                     case 'fadeOut':
-                        this.fadeOut(element, step.duration);
+                        this.fadeOut(element, duration);
+                        break;
+                    case 'delay':
+                        // ничего не делаем, просто ждём
                         break;
                     default:
-                        console.log('Unknown step: ' + step.name);
-                        break;
+                        console.warn('Unknown step:', name);
+                }
+
+                // Планируем следующий шаг
+                timerId = setTimeout(() => {
+                    timerId = null;
+                    currentIndex++;
+                    runStep();
+                }, duration);
+            };
+
+            // Запускаем с нулевой задержкой
+            timerId = setTimeout(runStep, 0);
+
+            // Возвращаем объект управления
+            return {
+                stop: () => {
+                    stopped = true;
+                    if (timerId) {
+                        clearTimeout(timerId);
+                        timerId = null;
+                    }
+                },
+                reset() {
+                    resetMoveAndScale(element);
+                    for (const step of steps) {
+                        if (step.name === 'fadeIn')
+                            resetFadeIn(element);
+                        if (step.name === 'fadeOut')
+                            resetFadeOut(element);
+                    }
                 }
             }
         }
