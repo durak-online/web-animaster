@@ -1,6 +1,7 @@
 addListeners();
 const heartbeatBlock = document.getElementById('heartbeatBlock');
 const heartBeating = animaster().heartBeating(heartbeatBlock);
+let mah = null;
 
 function addListeners() {
     document.getElementById('fadeInPlay')
@@ -24,7 +25,7 @@ function addListeners() {
     document.getElementById('mahPlay')
         .addEventListener('click', function () {
             const block = document.getElementById('mahBlock');
-            animaster().moveAndHide(block, 1000);
+            mah = animaster().moveAndHide(block, 1000);
         });
 
     document.getElementById('sahPlay')
@@ -37,6 +38,13 @@ function addListeners() {
         .addEventListener('click', function () {
             heartBeating.stop();
         });
+
+    document.getElementById('mahReset')
+        .addEventListener('click', function () {
+            mah.stop();
+        });
+
+
 }
 
 function getTransform(translation, ratio) {
@@ -73,6 +81,7 @@ function animaster() {
          * @param element — HTMLElement, который надо анимировать
          * @param duration — Продолжительность анимации в миллисекундах
          */
+
         fadeIn(element, duration) {
             element.style.transitionDuration = `${duration}ms`;
             element.classList.remove('hide');
@@ -139,6 +148,13 @@ function animaster() {
             const dur2 = duration * 3 / 5;
             this.move(element, dur1, {x: 100, y: 20});
             this.fadeOut(element, dur2);
+
+            return {
+                stop() {
+                    resetMoveAndScale(element);
+                    resetFadeOut(element);
+                }
+            };
         },
 
         showAndHide(element, duration) {
