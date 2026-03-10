@@ -51,6 +51,20 @@ function getTransform(translation, ratio) {
 }
 
 function animaster() {
+    let resetFadeIn =  function (element) {
+        element.style.transitionDuration = null;
+        element.classList.remove('show');
+    }
+
+    let resetFadeOut = function (element) {
+        element.style.transitionDuration = null;
+        element.classList.remove('hide');
+    }
+
+    let resetMoveAndScale = function(element) {
+        element.style.transitionDuration = null;
+        element.style.transform = null;
+    }
     return {
         /**
          * Блок плавно появляется из прозрачного.
