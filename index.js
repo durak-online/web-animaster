@@ -7,7 +7,7 @@ function addListeners() {
     document.getElementById('fadeInPlay')
         .addEventListener('click', function () {
             const block = document.getElementById('fadeInBlock');
-            animaster().fadeIn(block, 5000);
+            animaster().addFadeIn(5000).play(block);
         });
 
     document.getElementById('movePlay')
@@ -19,7 +19,7 @@ function addListeners() {
     document.getElementById('scalePlay')
         .addEventListener('click', function () {
             const block = document.getElementById('scaleBlock');
-            animaster().scale(block, 1000, 1.25);
+            animaster().addScale(1000, 1.25).play(block);
         });
 
     document.getElementById('mahPlay')
@@ -173,13 +173,46 @@ function animaster() {
             return this;
         },
 
+        addScale(duration, ratio) {
+            this._steps.push({
+                name: 'scale',
+                duration,
+                ratio
+            });
+            return this;
+        },
+
+        addFadeIn(duration) {
+            this._steps.push({
+                name: 'fadeIn',
+                duration
+            });
+            return this;
+        },
+
+        addFadeOut(duration) {
+            this._steps.push({
+                name: 'fadeOut',
+                duration
+            });
+            return this;
+        },
+
         play(element) {
             for (const step of this._steps) {
                 switch (step.name) {
                     case 'move':
                         this.move(element, step.duration, step.translation);
                         break;
-
+                    case 'scale':
+                        this.scale(element, step.duration, step.ratio);
+                        break;
+                    case 'fadeIn':
+                        this.fadeIn(element, step.duration);
+                        break;
+                    case 'fadeOut':
+                        this.fadeOut(element, step.duration);
+                        break;
                     default:
                         console.log('Unknown step: ' + step.name);
                         break;
