@@ -70,6 +70,19 @@ function animaster() {
         scale(element, duration, ratio) {
             element.style.transitionDuration = `${duration}ms`;
             element.style.transform = getTransform(null, ratio);
-        }
+        },
+
+        moveAndHide(element, duration, translation) {
+            const dur1 = duration * 2/5;
+            const dur2 = duration * 3/5;
+            this.move(element, dur1, {x:100, y: 20});
+            this.fadeOut(element, dur2);
+        },
+
+        showAndHide(element, duration) {
+            this.fageIn(element, duration*1/3);
+            setTimeout(() => {},duration*1/3);
+            this.fageIn(element, duration*1/3);
+        },
     }
 }
