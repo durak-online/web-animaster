@@ -181,7 +181,6 @@ function animaster() {
             return this;
         },
 
-        // Исправленный метод play
         play(element, cycled = false) {
             const steps = this._steps;
             let stopped = false;
@@ -191,7 +190,6 @@ function animaster() {
             const runStep = () => {
                 if (stopped) return;
 
-                // Если все шаги выполнены
                 if (currentIndex >= steps.length) {
                     if (cycled && steps.length > 0) {
                         currentIndex = 0;          // начать заново
@@ -203,7 +201,6 @@ function animaster() {
                 const step = steps[currentIndex];
                 const {name, duration, translation, ratio} = step;
 
-                // Выполняем текущий шаг
                 switch (name) {
                     case 'move':
                         this.move(element, duration, translation);
@@ -218,13 +215,11 @@ function animaster() {
                         this.fadeOut(element, duration);
                         break;
                     case 'delay':
-                        // ничего не делаем, просто ждём
                         break;
                     default:
                         console.warn('Unknown step:', name);
                 }
 
-                // Планируем следующий шаг
                 timerId = setTimeout(() => {
                     timerId = null;
                     currentIndex++;
@@ -232,10 +227,8 @@ function animaster() {
                 }, duration);
             };
 
-            // Запускаем с нулевой задержкой
             timerId = setTimeout(runStep, 0);
 
-            // Возвращаем объект управления
             return {
                 stop: () => {
                     stopped = true;
